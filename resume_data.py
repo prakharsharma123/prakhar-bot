@@ -40,6 +40,7 @@ Role: Full-Stack Developer (MERN & Python/Flask), currently a BCA student
 Contact: prakharsharmawork1@gmail.com | +918318276922
 LinkedIn: linkedin.com/in/prakhar-sharma-06april
 GitHub: github.com/prakharsharma123
+Prakhar Portfolio Website: prakhar-dev-iota.vercel.app/
 
 Objective: Self-driven full-stack developer skilled in the MERN stack, Python/Flask, and database
 engineering (MongoDB & MySQL), with hands-on experience independently designing, building, and
