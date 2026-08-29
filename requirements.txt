@@ -1,0 +1,11 @@
+# Core — required to run the app
+Flask==3.0.3
+google-genai==0.3.0
+Werkzeug==3.0.4
+gunicorn==22.0.0
+
+# Optional — only needed for the /admin/export Excel download.
+# Left unpinned so pip picks a version with a prebuilt wheel for your Python version
+# (pinning to an old pandas version can force a from-source build on newer Python/OS combos).
+pandas
+openpyxl

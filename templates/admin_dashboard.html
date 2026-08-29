@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — PrakharBot Admin</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script>
+  (function () {
+    var saved = localStorage.getItem('pb-theme');
+    if (saved === 'light' || saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  })();
+</script>
+</head>
+<body class="admin-body">
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-glyph">&gt;<span class="cursor"></span></span>
+    PRAKHAR_BOT <small>/ admin</small>
+  </div>
+  <div class="top-actions">
+    <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle dark or light mode">
+      <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
+    <span style="color:var(--text-dim); font-size:13.5px;">{{ admin_name }}</span>
+    <button class="btn btn-ghost" id="adminLogoutBtn">Log out</button>
+  </div>
+</header>
+
+<div class="admin-shell">
+  <h1 style="font-family:var(--font-display); font-weight:500; font-size:26px; margin-bottom:2px;">Who's talking to PrakharBot</h1>
+  <p style="color:var(--text-dim); font-size:14px; margin-top:0;">Every visitor who's chatted, signed up, or logged in.</p>
+
+  <div class="stat-grid" id="statGrid">
+    <div class="stat-card"><div class="stat-num" id="statUsers">—</div><div class="stat-label">Signed-up members</div></div>
+    <div class="stat-card"><div class="stat-num" id="statGuests">—</div><div class="stat-label">Guest visitors</div></div>
+    <div class="stat-card"><div class="stat-num" id="statMessages">—</div><div class="stat-label">Total messages</div></div>
+    <div class="stat-card"><div class="stat-num" id="statSignups">—</div><div class="stat-label">Signups today</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>people</h2>
+      <button class="btn btn-ghost" id="refreshBtn">Refresh</button>
+    </div>
+    <div id="peopleTableWrap">
+      <div class="empty-state">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<div class="conv-overlay" id="convOverlay">
+  <div class="conv-panel">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <h3 id="convTitle">Conversation</h3>
+      <button class="close-x" id="convClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="convBody"></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>

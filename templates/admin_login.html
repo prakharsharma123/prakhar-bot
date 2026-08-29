@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin login — PrakharBot</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script>
+  (function () {
+    var saved = localStorage.getItem('pb-theme');
+    if (saved === 'light' || saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  })();
+</script>
+</head>
+<body class="admin-body">
+<div class="admin-login-wrap">
+  <div class="admin-card">
+    <div class="brand">
+      <span class="brand-glyph">&gt;<span class="cursor"></span></span>
+      PRAKHAR_BOT
+    </div>
+    <h1>Admin login</h1>
+    <p class="modal-sub">Only you should be able to get in here.</p>
+
+    <p class="form-error" id="authError"></p>
+
+    <form id="adminLoginForm">
+      <div class="field">
+        <label for="identifier">Username or email</label>
+        <input type="text" id="identifier" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Log in</button>
+    </form>
+
+    <a class="back-link" href="/">&larr; Back to PrakharBot</a>
+  </div>
+</div>
+
+<script>
+  document.getElementById("adminLoginForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var errEl = document.getElementById("authError");
+    errEl.classList.remove("show");
+    errEl.textContent = "";
+
+    var identifier = document.getElementById("identifier").value.trim();
+    var password = document.getElementById("password").value;
+
+    try {
+      var res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier: identifier, password: password }),
+      });
+      var data = await res.json();
+      if (!res.ok) {
+        errEl.textContent = data.error || "Couldn't log you in.";
+        errEl.classList.add("show");
+        return;
+      }
+      window.location.href = "/admin/dashboard";
+    } catch (err) {
+      errEl.textContent = "Couldn't reach the server. Try again.";
+      errEl.classList.add("show");
+    }
+  });
+</script>
+</body>
+</html>

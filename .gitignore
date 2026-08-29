@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+chatbot.db
+visitor_data_export.xlsx
+venv/
