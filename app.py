@@ -1,4 +1,5 @@
 import os
+import secrets
 import sqlite3
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -15,19 +16,22 @@ from resume_data import PROFILE
 # Config (all secrets come from environment variables — never hardcode keys)
 # --------------------------------------------------------------------------
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
-FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "d775e610d88de979e31e3b0ceefc8a499e43838053c9381c3b5862ad4513603f")
-ADMIN_EXPORT_KEY = os.environ.get("ADMIN_EXPORT_KEY", "prakharsharmachatbox")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
+ADMIN_EXPORT_KEY = os.environ.get("ADMIN_EXPORT_KEY") or secrets.token_hex(16)
 try:
     FREE_MESSAGE_LIMIT = int(os.environ.get("FREE_MESSAGE_LIMIT", "6"))
 except ValueError:
-    FREE_MESSAGE_LIMIT = 6DB_PATH = os.environ.get("DB_PATH", "chatbot.db")
+    FREE_MESSAGE_LIMIT = 6
+DB_PATH = os.environ.get("DB_PATH", "chatbot.db")
 
 # Single admin account (that's you, Prakhar). Change these via environment
 # variables before deploying — never leave the default password in production.
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "prakhar")
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "prakharsharmawork1@gmail.com")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Prakhar@123")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD") or secrets.token_urlsafe(12)
+if not os.environ.get("ADMIN_PASSWORD"):
+    print("WARNING: ADMIN_PASSWORD env var not set; admin login is disabled-by-randomness. Set it in Render.")
 ADMIN_DISPLAY_NAME = os.environ.get("ADMIN_DISPLAY_NAME", "Prakhar Sharma")
 ADMIN_PASSWORD_HASH = generate_password_hash(ADMIN_PASSWORD)
 
