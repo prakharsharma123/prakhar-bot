@@ -18,8 +18,10 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
 FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "d775e610d88de979e31e3b0ceefc8a499e43838053c9381c3b5862ad4513603f")
 ADMIN_EXPORT_KEY = os.environ.get("ADMIN_EXPORT_KEY", "prakharsharmachatbox")
-FREE_MESSAGE_LIMIT = int(os.environ.get("FREE_MESSAGE_LIMIT", "6"))
-DB_PATH = os.environ.get("DB_PATH", "chatbot.db")
+try:
+    FREE_MESSAGE_LIMIT = int(os.environ.get("FREE_MESSAGE_LIMIT", "6"))
+except ValueError:
+    FREE_MESSAGE_LIMIT = 6DB_PATH = os.environ.get("DB_PATH", "chatbot.db")
 
 # Single admin account (that's you, Prakhar). Change these via environment
 # variables before deploying — never leave the default password in production.
