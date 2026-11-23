@@ -800,3 +800,6 @@ table.people-table tr:hover { background: var(--surface-hover); }
   .voice-speed { display: none; }
   .voice-select { max-width: 120px; }
 }
+
+/* clickable links inside bot replies */
+.bubble a { color: inherit; text-decoration: underline; text-underline-offset: 2px; word-break: break-all; }
