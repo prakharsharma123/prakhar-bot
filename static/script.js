@@ -30,6 +30,9 @@
   function formatBotText(str) {
     let safe = escapeHtml(str);
     safe = safe.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    // Make full http(s) links clickable (text is already HTML-escaped above).
+    safe = safe.replace(/(https?:\/\/[^\s<]+?)([.,!?)]*)(?=\s|<|$)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>$2');
     safe = safe.replace(/\n/g, "<br>");
     return safe;
   }
