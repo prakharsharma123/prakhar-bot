@@ -1,6 +1,7 @@
 import os
 import secrets
 import sqlite3
+import time
 import uuid
 from datetime import datetime, timedelta, timezone
 from functools import wraps
@@ -16,7 +17,13 @@ from resume_data import PROFILE
 # Config (all secrets come from environment variables — never hardcode keys)
 # --------------------------------------------------------------------------
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
+# Comma-separated fallbacks, tried in order if the main model is retired (404) or overloaded (503).
+GEMINI_FALLBACK_MODELS = [
+    m.strip()
+    for m in os.environ.get("GEMINI_FALLBACK_MODELS", "gemini-3.5-flash,gemini-2.5-flash").split(",")
+    if m.strip()
+]
 FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
 ADMIN_EXPORT_KEY = os.environ.get("ADMIN_EXPORT_KEY") or secrets.token_hex(16)
 try:
@@ -286,19 +293,35 @@ def api_chat():
             "words before or while you answer."
         )
 
-    try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=history + [{"role": "user", "parts": [{"text": message}]}],
-            config=types.GenerateContentConfig(
-                system_instruction=instruction,
-                max_output_tokens=500,
-                temperature=0.85,
-            ),
-        )
-        reply_text = response.text
-    except Exception as exc:  # noqa: BLE001 — surface a clean error to the UI
-        return jsonify({"error": f"AI request failed: {exc}"}), 502
+    contents = history + [{"role": "user", "parts": [{"text": message}]}]
+    config = types.GenerateContentConfig(
+        system_instruction=instruction,
+        max_output_tokens=500,
+        temperature=0.85,
+    )
+    reply_text = None
+    last_exc = None
+    for model_name in [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]:
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model=model_name, contents=contents, config=config
+                )
+                reply_text = response.text
+                break
+            except Exception as exc:  # noqa: BLE001
+                last_exc = exc
+                code = getattr(exc, "code", None)
+                if code in (503, 429, 500):
+                    time.sleep(1.5 * (2 ** attempt))  # overloaded: wait and retry
+                    continue
+                break  # 404 (retired model) or other error: try next model
+        if reply_text is not None:
+            break
+
+    if reply_text is None:
+        app.logger.error("Gemini failed: %s", last_exc)
+        return jsonify({"error": "I'm a bit busy right now. Please try again in a moment."}), 502
 
     log_message(person_type, person_key, person_name, person_email, message, reply_text)
 
